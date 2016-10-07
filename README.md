@@ -5,14 +5,14 @@ An online, interactive collaboration tool to draw, annotate and speak on a virtu
 
 Make sure you have npm installed
 
-'''
-$ git clone https://github.com/feross/webtorrent-desktop.git
-$ cd webtorrent-desktop
+```
+$ git clone https://github.com/prampey/Whiteboard.git
+$ cd Whiteboard
 $ npm install
-'''
+```
 
 Run the server on localhost:2000.
 
-'''
+```
 node index.js
-'''
+```
