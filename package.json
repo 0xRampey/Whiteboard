@@ -1,0 +1,9 @@
+{
+  "name": "draw-collab",
+  "version": "0.0.1",
+  "description": "A whiteboard app for collaboration",
+  "dependencies": {
+    "express": "^4.10.2",
+    "socket.io": "^1.4.8"
+  }
+}
