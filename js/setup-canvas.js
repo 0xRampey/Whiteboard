@@ -4,84 +4,97 @@ var canvas1 = new Canvas(canvasDiv1);
 canvas1.initCanvas();
 canvas1.addActions(canvas1);
 var socket = io.connect('http://localhost:2000');
-  socket.on('connect',function() {
-	console.log('Client has connected to the server!');
+socket.on('connect', function () {
+  console.log('Client has connected to the server!');
 });
 // Add a connect listener
-socket.on('draw',function(data) {
-//Weird object nesting. I know right?
+socket.on('draw', function (data) {
+  //Weird object nesting. I know right?
 
-  var data=parseData(data.message.message);
+  var data = parseData(data.message.message);
 
-  canvas1.redraw(data,false);
-	console.log('Received a message from the server!',data);
+  canvas1.redraw(data, false);
+  console.log('Received a message from the server!', data);
 });
 // Add a disconnect listener
-socket.on('disconnect',function() {
-	console.log('The client has disconnected!');
+socket.on('disconnect', function () {
+  console.log('The client has disconnected!');
 });
 
-function sendData(paintHistory)
-{
-  var data=encodeData(paintHistory);
-  socket.emit('draw',{message:data});
+function sendData(paintHistory) {
+  var data = encodeData(paintHistory);
+  socket.emit('draw', {
+    message: data
+  });
 }
-function parseData(data)
-{
+
+function parseData(data) {
   //Got back a string
-  var ph=data.split("'");
-  ph[0]=ph[0].split(",");
-  ph[1]=ph[1].split(",");
+  var ph = data.split("'");
+  ph[0] = ph[0].split(",");
+  ph[1] = ph[1].split(",");
 
-  ph[2]=ph[2].split(",");
+  ph[2] = ph[2].split(",");
 
-  for(var i=0;i<ph[0].length;i++)
-      {
-        //Converting string to respective types
-      ph[0][i]=Number(ph[0][i]);
-      ph[1][i]=Number(ph[1][i]);
-      ph[2][i]=(ph[2][i]=="true");
-        
-      }
+  for (var i = 0; i < ph[0].length; i++) {
+    //Converting string to respective types
+    ph[0][i] = Number(ph[0][i]);
+    ph[1][i] = Number(ph[1][i]);
+    ph[2][i] = (ph[2][i] == "true");
+
+  }
   return ph;
 }
-function encodeData(data)
-{
-  var string=data[0]+"'"+data[1]+"'"+data[2];
+
+function encodeData(data) {
+  var string = data[0] + "'" + data[1] + "'" + data[2];
   return string;
 }
+
 function Canvas(canvasDiv) {
+
+  // Always keep a copy of this (Pun intended)
+  var _this = this;
   var context;
   this.canvas;
   var id;
   var paintHistory;
   var paint;
   var clickX = new Array();
-    var clickY = new Array();
-    var clickDrag = new Array();
-function el(id){
-  return document.getElementById(id);
-} // Get elem by ID
+  var clickY = new Array();
+  var clickDrag = new Array();
+
+  function el(id) {
+    return document.getElementById(id);
+  } // Get elem by ID
 
 
-function readImage() {
-    if ( this.files && this.files[0] ) {
-        var FR= new FileReader();
-        FR.onload = function(e) {
-           var img = new Image();
-           img.onload = function() {
-             context.drawImage(img, 0, 0);
-           };
-           img.src = e.target.result;
-        };       
-        FR.readAsDataURL( this.files[0] );
+  function readImage() {
+    if (this.files && this.files[0]) {
+      var file = this.files[0];
+      var FR = new FileReader();
+      FR.onload = function (e) {
+        if (file.type == 'application/pdf') {
+          //Do pdf stuff here
+          // Converting Blob into URL for pdfjs
+          var url = URL.createObjectURL(file);
+          renderPDF(url, _this.canvas, canvasDiv);
+        } else {
+          var img = new Image();
+          img.onload = function () {
+            context.drawImage(img, 0, 0);
+          };
+          img.src = e.target.result;
+        }
+      };
+      FR.readAsDataURL(file);
     }
-}
+  }
 
-el("fileUpload").addEventListener("change", readImage, false);
-  
-  
-  this.redraw = function (pH,stream) {
+  el("fileUpload").addEventListener("change", readImage, false);
+
+
+  this.redraw = function (pH, stream) {
     if (stream) {
       sendData(pH);
     }
@@ -90,7 +103,6 @@ el("fileUpload").addEventListener("change", readImage, false);
     context.strokeStyle = "#df4b26";
     context.lineJoin = "round";
     context.lineWidth = 5;
-    console.log(pH);
     var clickX = pH[0];
     var clickY = pH[1];
     var clickDrag = pH[2];
@@ -126,26 +138,25 @@ el("fileUpload").addEventListener("change", readImage, false);
 
   }
 
-  this.addActions=function(context)
-  {
-  $(id).mousedown(function (e) {
-    // Localizing coordinates to the canvas area
-    var mouseX = e.pageX - this.offsetLeft;
-    var mouseY = e.pageY - this.offsetTop;
-    paint = true;
-    addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop,false);
-    context.redraw(paintHistory,true);
-  });
+  this.addActions = function (context) {
+    $(id).mousedown(function (e) {
+      // Localizing coordinates to the canvas area
+      var mouseX = e.pageX - this.offsetLeft;
+      var mouseY = e.pageY - this.offsetTop;
+      paint = true;
+      addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, false);
+      context.redraw(paintHistory, true);
+    });
 
-  $(id).mousemove(function (e) {
-    if (paint) {
-      addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
-      context.redraw(paintHistory,true);
-    }
-  });
-  $(id).mouseup(function (e) {
-    paint = false;
-  });
+    $(id).mousemove(function (e) {
+      if (paint) {
+        addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
+        context.redraw(paintHistory, true);
+      }
+    });
+    $(id).mouseup(function (e) {
+      paint = false;
+    });
   }
 
 

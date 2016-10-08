@@ -20,4 +20,5 @@ function renderPDF(url, canvas, canvasContainer, options) {
     PDFJS.disableWorker = true;
     PDFJS.getDocument(url).then(renderPages);
 
+
 }   
