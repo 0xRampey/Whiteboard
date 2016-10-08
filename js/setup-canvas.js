@@ -59,7 +59,28 @@ function Canvas(canvasDiv) {
   var clickX = new Array();
     var clickY = new Array();
     var clickDrag = new Array();
+function el(id){
+  return document.getElementById(id);
+} // Get elem by ID
 
+
+function readImage() {
+    if ( this.files && this.files[0] ) {
+        var FR= new FileReader();
+        FR.onload = function(e) {
+           var img = new Image();
+           img.onload = function() {
+             context.drawImage(img, 0, 0);
+           };
+           img.src = e.target.result;
+        };       
+        FR.readAsDataURL( this.files[0] );
+    }
+}
+
+el("fileUpload").addEventListener("change", readImage, false);
+  
+  
   this.redraw = function (pH,stream) {
     if (stream) {
       sendData(pH);
@@ -69,7 +90,7 @@ function Canvas(canvasDiv) {
     context.strokeStyle = "#df4b26";
     context.lineJoin = "round";
     context.lineWidth = 5;
-console.log(pH);
+    console.log(pH);
     var clickX = pH[0];
     var clickY = pH[1];
     var clickDrag = pH[2];
