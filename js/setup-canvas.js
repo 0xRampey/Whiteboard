@@ -16,6 +16,17 @@ socket.on('draw', function (data) {
   canvas1.redraw(data, false);
   console.log('Received a message from the server!', data);
 });
+socket.on('file', function (data) {
+  //Weird object nesting. I know right?
+  var file = data['buffer'];
+  var type = data['type'];
+  // Convert incoming ArrayBuffer to Blob type. Why? Coz Node ain't good at this shit.
+  file = new Blob([file], {
+    type: type
+  });
+  canvas1.uploadFile(file);
+  console.log('Received a message from the server!', data);
+});
 // Add a disconnect listener
 socket.on('disconnect', function () {
   console.log('The client has disconnected!');
@@ -25,6 +36,13 @@ function sendData(paintHistory) {
   var data = encodeData(paintHistory);
   socket.emit('draw', {
     message: data
+  });
+}
+
+function sendFile(file) {
+  socket.emit('file', {
+    buffer: file,
+    type: file.type
   });
 }
 
@@ -69,9 +87,10 @@ function Canvas(canvasDiv) {
   } // Get elem by ID
 
 
-  function readImage() {
+  this.readImage = function () {
     if (this.files && this.files[0]) {
       var file = this.files[0];
+      sendFile(file);
       var FR = new FileReader();
       FR.onload = function (e) {
         if (file.type == 'application/pdf') {
@@ -90,8 +109,29 @@ function Canvas(canvasDiv) {
       FR.readAsDataURL(file);
     }
   }
+  this.uploadFile = function (file) {
 
-  el("fileUpload").addEventListener("change", readImage, false);
+    var FR = new FileReader();
+    FR.onload = function (e) {
+      if (file.type == 'application/pdf') {
+        //Do pdf stuff here
+        // Converting Blob into URL for pdfjs
+        var url = URL.createObjectURL(file);
+        renderPDF(url, _this.canvas, canvasDiv);
+      } else {
+        var img = new Image();
+        img.onload = function () {
+          context.drawImage(img, 0, 0);
+        };
+        img.src = e.target.result;
+      }
+    };
+
+    FR.readAsDataURL(file);
+  }
+
+
+  el("fileUpload").addEventListener("change", _this.readImage, false);
 
 
   this.redraw = function (pH, stream) {
