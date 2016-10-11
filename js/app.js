@@ -1,5 +1,7 @@
-var webrtc=require('webrtc');
+var renderPDF=require('./pdf-render');
+var webrtc=require('./webrtc');
 var startButton=document.getElementById("start");
+//Initate voice chat
 startButton.onclick=webrtc;
 var canvasDiv1 = document.getElementById('canvasDiv');
 var numCanvas = 0;

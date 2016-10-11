@@ -22,3 +22,4 @@ function renderPDF(url, canvas, canvasContainer, options) {
 
 
 }   
+module.exports=renderPDF;

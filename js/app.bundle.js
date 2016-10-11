@@ -1,5 +1,8 @@
-var webrtc=require('webrtc');
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var renderPDF=require('./pdf-render');
+var webrtc=require('./webrtc');
 var startButton=document.getElementById("start");
+//Initate voice chat
 startButton.onclick=webrtc;
 var canvasDiv1 = document.getElementById('canvasDiv');
 var numCanvas = 0;
@@ -210,3 +213,48 @@ function Canvas(canvasDiv) {
     paintHistory = [clickX, clickY, clickDrag];
   }
 }
+
+},{"./pdf-render":2,"./webrtc":3}],2:[function(require,module,exports){
+function renderPDF(url, canvas, canvasContainer, options) {
+
+    var options = options || { scale: 1 };
+        
+    function renderPage(page) {
+        var viewport = page.getViewport(options.scale);
+        var ctx = canvas.getContext('2d');
+        var renderContext = {
+          canvasContext: ctx,
+          viewport: viewport
+        };
+        page.render(renderContext);
+    }
+    
+    function renderPages(pdfDoc) {
+        for(var num = 1; num <= pdfDoc.numPages; num++)
+            pdfDoc.getPage(num).then(renderPage);
+    }
+
+    PDFJS.disableWorker = true;
+    PDFJS.getDocument(url).then(renderPages);
+
+
+}   
+module.exports=renderPDF;
+},{}],3:[function(require,module,exports){
+// All WebRTC code goes here
+
+function startVoice(){
+  var webrtc = new SimpleWebRTC({
+  // the id/element dom element that will hold "our" video
+  media: { video: false, audio: true },
+  // immediately ask for camera access
+  autoRequestMedia: true
+});
+
+webrtc.on('readyToCall', function () {
+  // you can name it anything
+  webrtc.joinRoom('test');
+});
+}
+module.exports=startVoice;
+},{}]},{},[1]);
