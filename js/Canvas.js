@@ -1,78 +1,4 @@
-var webrtc=require('webrtc');
-var startButton=document.getElementById("start");
-startButton.onclick=webrtc;
-var canvasDiv1 = document.getElementById('canvasDiv');
-var numCanvas = 0;
-var canvas1 = new Canvas(canvasDiv1);
-canvas1.initCanvas();
-canvas1.addActions(canvas1);
-var socket = io.connect('http://localhost:2000');
-socket.on('connect', function () {
-  console.log('Client has connected to the server!');
-});
-// Add a connect listener
-socket.on('draw', function (data) {
-  //Weird object nesting. I know right?
-
-  var data = parseData(data.message.message);
-
-  canvas1.redraw(data, false);
-  console.log('Received a message from the server!', data);
-});
-socket.on('file', function (data) {
-  //Weird object nesting. I know right?
-  var file = data['buffer'];
-  var type = data['type'];
-  // Convert incoming ArrayBuffer to Blob type. Why? Coz Node doesn't support Blobs dammit.
-  file = new Blob([file], {
-    type: type
-  });
-  canvas1.uploadFile(file);
-  console.log('Received a message from the server!', data);
-});
-// Add a disconnect listener
-socket.on('disconnect', function () {
-  console.log('The client has disconnected!');
-});
-
-function sendData(paintHistory) {
-  var data = encodeData(paintHistory);
-  socket.emit('draw', {
-    message: data
-  });
-}
-
-function sendFile(file) {
-  socket.emit('file', {
-    buffer: file,
-    type: file.type
-  });
-}
-
-function parseData(data) {
-  //Got back a string
-  var ph = data.split("'");
-  ph[0] = ph[0].split(",");
-  ph[1] = ph[1].split(",");
-
-  ph[2] = ph[2].split(",");
-
-  for (var i = 0; i < ph[0].length; i++) {
-    //Converting string to respective types
-    ph[0][i] = Number(ph[0][i]);
-    ph[1][i] = Number(ph[1][i]);
-    ph[2][i] = (ph[2][i] == "true");
-
-  }
-  return ph;
-}
-
-function encodeData(data) {
-  var string = data[0] + "'" + data[1] + "'" + data[2];
-  return string;
-}
-
-function Canvas(canvasDiv) {
+function Canvas(canvasDiv, socket) {
 
   // Always keep a copy of this (Pun intended)
   var _this = this;
@@ -89,7 +15,30 @@ function Canvas(canvasDiv) {
     return document.getElementById(id);
   } // Get elem by ID
 
-
+  this.setupSocketCallbacks = function () {
+    socket.on('connect', function () {
+      console.log('Client has connected to the server!');
+    });
+    socket.on('draw', function (data) {
+      //Weird object nesting. I know right?
+      var data = parseData(data.message.message);
+      _this.redraw(data, false);
+    });
+    socket.on('file', function (data) {
+      //Weird object nesting. I know right?
+      var file = data['buffer'];
+      var type = data['type'];
+      // Convert incoming ArrayBuffer to Blob type. Why? Coz Node doesn't support Blobs dammit.
+      file = new Blob([file], {
+        type: type
+      });
+      _this.uploadFile(file);
+    });
+    // Add a disconnect listener
+    socket.on('disconnect', function () {
+      console.log('The client has disconnected!');
+    });
+  }
   this.readImage = function () {
     if (this.files && this.files[0]) {
       var file = this.files[0];
@@ -111,6 +60,43 @@ function Canvas(canvasDiv) {
       };
       FR.readAsDataURL(file);
     }
+  }
+
+  function sendData(paintHistory) {
+    var data = encodeData(paintHistory);
+    socket.emit('draw', {
+      message: data
+    });
+  }
+
+  function sendFile(file) {
+    socket.emit('file', {
+      buffer: file,
+      type: file.type
+    });
+  }
+
+  function parseData(data) {
+    //Got back a string
+    var ph = data.split("'");
+    ph[0] = ph[0].split(",");
+    ph[1] = ph[1].split(",");
+
+    ph[2] = ph[2].split(",");
+
+    for (var i = 0; i < ph[0].length; i++) {
+      //Converting string to respective types
+      ph[0][i] = Number(ph[0][i]);
+      ph[1][i] = Number(ph[1][i]);
+      ph[2][i] = (ph[2][i] == "true");
+
+    }
+    return ph;
+  }
+
+  function encodeData(data) {
+    var string = data[0] + "'" + data[1] + "'" + data[2];
+    return string;
   }
   this.uploadFile = function (file) {
 
@@ -165,14 +151,13 @@ function Canvas(canvasDiv) {
     }
   };
 
-
+  // Setup and initialise canvas
   this.initCanvas = function () {
     this.canvas = document.createElement('canvas');
-    numCanvas++;
     this.canvas.setAttribute('width', 800);
     this.canvas.setAttribute('height', 800);
-    id = '#canvas' + String(numCanvas);
-    this.canvas.setAttribute('id', 'canvas' + String(numCanvas));
+    id = '#canvas' + '0';
+    this.canvas.setAttribute('id', 'canvas' + '0');
     canvasDiv.appendChild(this.canvas);
     if (typeof G_vmlCanvasManager != 'undefined') {
       this.canvas = G_vmlCanvasManager.initElement(this.canvas);
@@ -181,7 +166,7 @@ function Canvas(canvasDiv) {
 
   }
 
-  this.addActions = function (context) {
+  this.setupActions = function (context) {
     $(id).mousedown(function (e) {
       // Localizing coordinates to the canvas area
       var mouseX = e.pageX - this.offsetLeft;
@@ -210,3 +195,4 @@ function Canvas(canvasDiv) {
     paintHistory = [clickX, clickY, clickDrag];
   }
 }
+module.exports = Canvas;
