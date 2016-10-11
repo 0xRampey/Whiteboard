@@ -20,7 +20,7 @@ socket.on('file', function (data) {
   //Weird object nesting. I know right?
   var file = data['buffer'];
   var type = data['type'];
-  // Convert incoming ArrayBuffer to Blob type. Why? Coz Node ain't good at this shit.
+  // Convert incoming ArrayBuffer to Blob type. Why? Coz Node doesn't support Blobs dammit.
   file = new Blob([file], {
     type: type
   });
@@ -160,7 +160,7 @@ function Canvas(canvasDiv) {
       context.closePath();
       context.stroke();
     }
-  }
+  };
 
 
   this.initCanvas = function () {
