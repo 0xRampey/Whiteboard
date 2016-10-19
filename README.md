@@ -11,7 +11,7 @@ $ cd Whiteboard
 $ npm install
 ```
 
-Run the server on localhost:2000.
+Run the server on ec2-54-244-76-103.us-west-2.compute.amazonaws.com
 
 ```
 node index.js
