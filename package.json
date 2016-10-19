@@ -8,5 +8,8 @@
   },
   "devDependencies": {
     "browserify": "^13.1.0"
+  },
+  "scripts": {
+    "build": "browserify js/app.js -o js/app.bundle.js"
   }
 }

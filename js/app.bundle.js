@@ -199,11 +199,11 @@ function Canvas(canvasDiv, socket) {
 module.exports = Canvas;
 
 },{}],2:[function(require,module,exports){
+(function (global){
 var renderPDF = require('./pdf-render');
+global.renderPDF = renderPDF;
 var webrtc = require('./webrtc');
 var Canvas = require('./Canvas');
-
-
 var startButton = document.getElementById("start");
 //Initate voice chat
 startButton.onclick = webrtc;
@@ -215,6 +215,7 @@ canvas1.initCanvas();
 canvas1.setupActions(canvas1);
 canvas1.setupSocketCallbacks();
 
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./Canvas":1,"./pdf-render":3,"./webrtc":4}],3:[function(require,module,exports){
 function renderPDF(url, canvas, canvasContainer, options) {
 

@@ -1,8 +1,7 @@
 var renderPDF = require('./pdf-render');
+global.renderPDF = renderPDF;
 var webrtc = require('./webrtc');
 var Canvas = require('./Canvas');
-
-
 var startButton = document.getElementById("start");
 //Initate voice chat
 startButton.onclick = webrtc;
