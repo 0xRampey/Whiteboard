@@ -26,6 +26,7 @@ function Canvas(canvasDiv, socket) {
       _this.redraw(data, false);
     });
     socket.on('file', function (data) {
+      console.log(data);
       var file = data['buffer'];
       var type = data['type'];
       // Convert incoming ArrayBuffer to Blob type. Why? Coz Node doesn't support Blobs dammit.
@@ -65,6 +66,7 @@ function Canvas(canvasDiv, socket) {
 
   function sendData(paintHistory) {
     var data = encodeData(paintHistory);
+    console.log(data);
     socket.emit('draw', {
       message: data
     });
@@ -114,6 +116,11 @@ function Canvas(canvasDiv, socket) {
           context.drawImage(img, 0, 0);
         };
         img.src = e.target.result;
+      }
+      if (e) {
+        console.log("Loaded image");
+      } else {
+        console.log("Cannot load image");
       }
     };
 

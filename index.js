@@ -15,6 +15,7 @@ io.on('connection', function (socket) {
   });
   socket.on('draw', function (data) {
     if (users.length > 1) {
+
       socket.broadcast.emit('draw', {
         message: data
       });
