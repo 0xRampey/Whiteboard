@@ -26,7 +26,6 @@ function Canvas(canvasDiv, socket) {
       _this.redraw(data, false);
     });
     socket.on('file', function (data) {
-      //Weird object nesting. I know right?
       var file = data['buffer'];
       var type = data['type'];
       // Convert incoming ArrayBuffer to Blob type. Why? Coz Node doesn't support Blobs dammit.
@@ -36,8 +35,9 @@ function Canvas(canvasDiv, socket) {
       _this.uploadFile(file);
     });
     // Add a disconnect listener
-    socket.on('disconnect', function () {
+    socket.on('disconnect', function (message) {
       console.log('The client has disconnected!');
+      console.log(message);
     });
   }
   this.readImage = function () {
@@ -208,7 +208,7 @@ var startButton = document.getElementById("start");
 //Initate voice chat
 startButton.onclick = webrtc;
 var canvasDiv1 = document.getElementById('canvasDiv');
-var socket = io.connect('http://54.244.76.103:80');
+var socket = io.connect();
 //Provide canvas with a div holder and socket connection.
 var canvas1 = new Canvas(canvasDiv1, socket);
 canvas1.initCanvas();

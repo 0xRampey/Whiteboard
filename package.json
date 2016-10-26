@@ -1,7 +1,7 @@
 {
-  "name": "draw-collab",
+  "name": "Whiteboard",
   "version": "0.0.1",
-  "description": "A whiteboard app for collaboration",
+  "description": "An online, interactive collaboration tool to draw, annotate and speak on a virtual whiteboard.",
   "dependencies": {
     "express": "^4.10.2",
     "socket.io": "^1.4.8"
@@ -10,6 +10,7 @@
     "browserify": "^13.1.0"
   },
   "scripts": {
-    "build": "browserify js/app.js -o js/app.bundle.js"
+    "build": "browserify js/app.js -o js/app.bundle.js",
+    "start": "node index.js"
   }
 }

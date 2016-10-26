@@ -25,7 +25,6 @@ function Canvas(canvasDiv, socket) {
       _this.redraw(data, false);
     });
     socket.on('file', function (data) {
-      //Weird object nesting. I know right?
       var file = data['buffer'];
       var type = data['type'];
       // Convert incoming ArrayBuffer to Blob type. Why? Coz Node doesn't support Blobs dammit.
@@ -35,8 +34,9 @@ function Canvas(canvasDiv, socket) {
       _this.uploadFile(file);
     });
     // Add a disconnect listener
-    socket.on('disconnect', function () {
+    socket.on('disconnect', function (message) {
       console.log('The client has disconnected!');
+      console.log(message);
     });
   }
   this.readImage = function () {
