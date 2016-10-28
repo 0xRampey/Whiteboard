@@ -1,21 +1,26 @@
 <!doctype html>
 <html lang="en-us">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Collab-draw</title>
-    <link rel="stylesheet" href="css/style.css">
-    <script src="https://simplewebrtc.com/latest-v2.js"></script> 
-  </head>
-  <body>
-    <button id="start">Start voice chat</button>
-    <input type='file' id="fileUpload" />
-   <div class="border" id="canvasDiv"></div>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script type="text/javascript" src="js/pdf.js"></script>
-    <script src="js/socket.io.js"></script>
-    <script src="js/app.bundle.js"></script>
-  </body>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Whiteboard</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://simplewebrtc.com/latest-v2.js"></script>
+</head>
+
+<body>
+  <button id="start">Start voice chat</button>
+  <button id="left">Left</button>
+  <button id="right">Right</button>
+  <input type='file' id="fileUpload" />
+  <div class="border" id="canvasDiv"></div>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script type="text/javascript" src="js/pdf.js"></script>
+  <script src="js/socket.io.js"></script>
+  <script src="js/app.bundle.js"></script>
+</body>
+
 </html>

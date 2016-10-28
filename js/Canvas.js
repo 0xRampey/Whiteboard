@@ -10,6 +10,7 @@ function Canvas(canvasDiv, socket) {
   var clickX = new Array();
   var clickY = new Array();
   var clickDrag = new Array();
+  var pdf;
 
   function el(id) {
     return document.getElementById(id);
@@ -50,7 +51,10 @@ function Canvas(canvasDiv, socket) {
           //Do pdf stuff here
           // Converting Blob into URL for pdfjs
           var url = URL.createObjectURL(file);
-          renderPDF(url, _this.canvas, canvasDiv);
+          pdf = new renderPDF(url, _this.canvas, canvasDiv);
+          // Setting up page-turn actions
+          el('right').onclick = pdf.renderNextPage;
+          el('left').onclick = pdf.renderPrevPage;
         } else {
           var img = new Image();
           img.onload = function () {
@@ -108,7 +112,8 @@ function Canvas(canvasDiv, socket) {
         //Do pdf stuff here
         // Converting Blob into URL for pdfjs
         var url = URL.createObjectURL(file);
-        renderPDF(url, _this.canvas, canvasDiv);
+        pdf = new renderPDF(url, _this.canvas, canvasDiv);
+
       } else {
         var img = new Image();
         img.onload = function () {
@@ -170,6 +175,7 @@ function Canvas(canvasDiv, socket) {
       this.canvas = G_vmlCanvasManager.initElement(this.canvas);
     }
     context = this.canvas.getContext("2d");
+
 
   }
 

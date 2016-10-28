@@ -11,6 +11,7 @@ function Canvas(canvasDiv, socket) {
   var clickX = new Array();
   var clickY = new Array();
   var clickDrag = new Array();
+  var pdf;
 
   function el(id) {
     return document.getElementById(id);
@@ -51,7 +52,10 @@ function Canvas(canvasDiv, socket) {
           //Do pdf stuff here
           // Converting Blob into URL for pdfjs
           var url = URL.createObjectURL(file);
-          renderPDF(url, _this.canvas, canvasDiv);
+          pdf = new renderPDF(url, _this.canvas, canvasDiv);
+          // Setting up page-turn actions
+          el('right').onclick = pdf.renderNextPage;
+          el('left').onclick = pdf.renderPrevPage;
         } else {
           var img = new Image();
           img.onload = function () {
@@ -109,7 +113,8 @@ function Canvas(canvasDiv, socket) {
         //Do pdf stuff here
         // Converting Blob into URL for pdfjs
         var url = URL.createObjectURL(file);
-        renderPDF(url, _this.canvas, canvasDiv);
+        pdf = new renderPDF(url, _this.canvas, canvasDiv);
+
       } else {
         var img = new Image();
         img.onload = function () {
@@ -172,6 +177,7 @@ function Canvas(canvasDiv, socket) {
     }
     context = this.canvas.getContext("2d");
 
+
   }
 
   this.setupActions = function (context) {
@@ -225,30 +231,55 @@ canvas1.setupSocketCallbacks();
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./Canvas":1,"./pdf-render":3,"./webrtc":4}],3:[function(require,module,exports){
 function renderPDF(url, canvas, canvasContainer, options) {
+  var pdfDoc;
+  var state = 1;
 
-    var options = options || { scale: 1 };
-        
-    function renderPage(page) {
-        var viewport = page.getViewport(options.scale);
-        var ctx = canvas.getContext('2d');
-        var renderContext = {
-          canvasContext: ctx,
-          viewport: viewport
-        };
-        page.render(renderContext);
+  var options = options || {
+    scale: 1
+  };
+
+  function renderPage(page) {
+    var viewport = page.getViewport(options.scale);
+    var ctx = canvas.getContext('2d');
+    var renderContext = {
+      canvasContext: ctx,
+      viewport: viewport
+    };
+    page.render(renderContext);
+  }
+
+  function renderPages(pdfDo) {
+    //for(var num = 1; num <= pdfDoc.numPages; num++)
+    pdfDoc = pdfDo;
+    pdfDoc.getPage(state).then(renderPage);
+  }
+
+  this.renderNextPage = function () {
+
+    if (state < pdfDoc.numPages) {
+
+      state = state + 1;
+      pdfDoc.getPage(state).then(renderPage);
+    } else {
+      console.log("Reached end of pdf!");
     }
-    
-    function renderPages(pdfDoc) {
-        for(var num = 1; num <= pdfDoc.numPages; num++)
-            pdfDoc.getPage(num).then(renderPage);
+  }
+  this.renderPrevPage = function () {
+
+    if (state > 1) {
+      state = state - 1;
+      pdfDoc.getPage(state).then(renderPage);
+    } else {
+      console.log("Reached start of pdf!");
     }
+  }
+  PDFJS.disableWorker = true;
+  PDFJS.getDocument(url).then(renderPages);
 
-    PDFJS.disableWorker = true;
-    PDFJS.getDocument(url).then(renderPages);
 
+}
+module.exports = renderPDF;
 
-}   
-module.exports=renderPDF;
 },{}],4:[function(require,module,exports){
 // All WebRTC code goes here
 
