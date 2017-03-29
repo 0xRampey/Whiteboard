@@ -9,10 +9,5 @@ Make sure you have npm installed
 $ git clone https://github.com/prampey/Whiteboard.git
 $ cd Whiteboard
 $ npm install
-```
-
-Run the server on ec2-54-244-76-103.us-west-2.compute.amazonaws.com
-
-```
-node index.js
+$ npm start
 ```
