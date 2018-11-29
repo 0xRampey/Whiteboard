@@ -2,6 +2,7 @@ var app = require('express')();
 var express = require('express');
 var io = require('socket.io')(http);
 var http = require('http').Server(app);
+const port=process.env.PORT || 3000
 var users = [];
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
@@ -34,4 +35,4 @@ io.on('connection', function (socket) {
     }
   });
 });
-io.listen(app.listen(80));
+io.listen(app.listen(port));
